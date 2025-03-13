@@ -1,0 +1,172 @@
+'''considerando a funcao de runge abaixo, faça 3 amostras igualmente espaçadas de
+ 6, 10 e 14 pontos(X e Y).com essas amostras, plote 3 interpolações com essas amostras. 
+Plote no mesemo grafico e spline de grau 3 usando a amostra de 10 pontos.
+use o intervalo [-2,2] para o eixo x. explique o que o grafico mostra. f(x)= (1)/(1+25x^2)
+'''
+
+
+import numpy as np
+import matplotlib as plt
+import scipy
+
+
+def quadratic_spline_interpolation(valores_x, valores_y, x_interp):
+    """
+    Função para calcular a interpolação spline quadrática.
+    
+    :param valores_x: Lista com os valores de x conhecidos
+    :param valores_y: Lista com os valores de y correspondentes
+    :param x_interp: Valor de x a ser interpolado
+    :return: Valor interpolado
+    """
+    n = len(valores_x) - 1  # Número de intervalos
+    a = valores_y
+    b = np.zeros(n)
+    c = np.zeros(n + 1)
+    h = [valores_x[i + 1] - valores_x[i] for i in range(n)]
+    
+    # Montando o sistema de equações para encontrar os coeficientes c
+    A = np.zeros((n + 1, n + 1))
+    B = np.zeros(n + 1)
+    
+    A[0][0] = 1  # Condição de contorno natural
+    A[n][n] = 1  # Condição de contorno natural
+    
+    for i in range(1, n):
+        A[i][i - 1] = h[i - 1]
+        A[i][i] = 2 * (h[i - 1] + h[i])
+        A[i][i + 1] = h[i]
+        B[i] = (3 / h[i]) * (a[i + 1] - a[i]) - (3 / h[i - 1]) * (a[i] - a[i - 1])
+    
+    # Resolvendo o sistema linear
+    c = np.linalg.solve(A, B)
+    
+    # Calculando b e d
+    d = np.zeros(n)
+    for i in range(n):
+        b[i] = (a[i + 1] - a[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
+        d[i] = (c[i + 1] - c[i]) / (3 * h[i])
+    
+    # Encontrar o intervalo correto para x_interp
+    for i in range(n):
+        if valores_x[i] <= x_interp <= valores_x[i + 1]:
+            dx = x_interp - valores_x[i]
+            return a[i] + b[i] * dx + c[i] * dx**2 + d[i] * dx**3
+    
+    raise ValueError("x_interp está fora do intervalo fornecido.")
+
+# Exemplo de uso:
+valores_x = [1.0, 2.0, 3.0, 4.0]  # Valores conhecidos de x
+valores_y = [2.0, 3.0, 5.0, 7.0]  # Correspondentes valores de y
+x_interp = 2.5  # Valor de x a ser interpolado
+
+resultado_spline_quadratica = quadratic_spline_interpolation(valores_x, valores_y, x_interp)
+print(f"Spline Quadrática: p({x_interp}) = {resultado_spline_quadratica}")
+
+
+
+
+
+
+#me de o resultado disso, o codigo modificado e comentado explicando como tudo foi feito. 
+# nao use bibliotecas prontas, use o codigo acima
+
+
+
+
+
+
+
+
+'''
+
+Passo a Passo do Código
+Importação das Bibliotecas
+
+numpy: Para manipulação de arrays e geração de valores numéricos.
+matplotlib.pyplot: Para visualização gráfica dos resultados.
+scipy.interpolate: Para realizar a interpolação usando BarycentricInterpolator (Lagrange) e CubicSpline.
+Definição da Função de Runge'''
+
+def runge_function(x):
+    return 1 / (1 + 25 * x**2)
+"""Essa é a função que será interpolada.
+Geração dos Pontos de Amostragem"""
+
+num_points = [6, 10, 14]
+x_vals_fine = np.linspace(-2, 2, 500)
+y_true = runge_function(x_vals_fine)
+
+"""Três conjuntos de pontos igualmente espaçados são definidos com 6, 10 e 14 pontos.
+x_vals_fine cria 500 pontos no intervalo [-2,2] para um gráfico suave.
+y_true contém os valores reais da função.
+Plotagem da Função de Runge"""
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_vals_fine, y_true, 'k-', label='Função de Runge (Real)')
+"""A função de Runge é plotada como referência no gráfico.
+Interpolação Polinomial de Lagrange"""
+
+for n in num_points:
+    x_sample = np.linspace(-2, 2, n)
+    y_sample = runge_function(x_sample)
+    
+    poly_interp = BarycentricInterpolator(x_sample, y_sample)
+    y_poly = poly_interp(x_vals_fine)
+
+    plt.plot(x_vals_fine, y_poly, '--', label=f'Interpolação Polinomial ({n} pontos)')
+    plt.scatter(x_sample, y_sample, marker='o', label=f'Amostras ({n} pontos)')
+
+"""Para cada conjunto de amostras (6, 10 e 14 pontos), é criada uma interpolação polinomial usando BarycentricInterpolator.
+A interpolação é plotada como linha pontilhada --.
+Os pontos amostrados são marcados no gráfico.
+Interpolação Spline Cúbica (apenas para 10 pontos)"""
+
+
+x_spline = np.linspace(-2, 2, 10)
+y_spline = runge_function(x_spline)
+cs = CubicSpline(x_spline, y_spline, bc_type='natural')
+
+y_spline_vals = cs(x_vals_fine)
+plt.plot(x_vals_fine, y_spline_vals, '-.', label='Spline Cúbica (10 pontos)')
+"""Apenas a amostra de 10 pontos é usada para criar um spline cúbico natural (bc_type='natural' garante derivadas segundas nulas nas bordas).
+O spline é avaliado nos pontos x_vals_fine e plotado com a linha traço-ponto"""
+
+
+"""me explique o resultado do grafico gerado"""
+
+
+
+
+
+"""Análise do Gráfico Gerado
+O gráfico compara diferentes métodos de interpolação aplicados à função de Runge 
+
+f(x)=11+25x2
+f(x)=1+25x21
+
+ , destacando as limitações da interpolação polinomial e a estabilidade da spline cúbica.
+
+Observações Importantes
+Curva Preta (Função de Runge - Real)
+
+Representa a função original, suave e simétrica em relação ao eixo y
+Possui um pico central e valores que rapidamente diminuem nas extremidades.
+Interpolação Polinomial (Linhas Pontilhadas - 6, 10 e 14 pontos)
+
+Para 6 pontos (linha azul pontilhada), a interpolação aproxima bem a função, mas já apresenta alguma distorção nas bordas.
+Para 10 pontos (linha laranja pontilhada), a oscilação nas extremidades começa a aumentar.
+Para 14 pontos (linha verde pontilhada), há oscilações intensas perto das bordas do intervalo, um fenômeno conhecido como efeito de Runge.
+Spline Cúbica (Linha Vermelha Traço-Ponto - 10 pontos)
+
+Suaviza a interpolação, evitando oscilações excessivas nas extremidades.
+Aproxima melhor a função real sem gerar grandes distorções.
+Pontos Amostrados (Marcadores Coloridos)
+
+Os pontos usados na interpolação são bem visíveis.
+A interpolação polinomial passa exatamente por esses pontos, mas apresenta oscilações não desejadas nas regiões intermediárias.
+Conclusão
+Interpolação polinomial com muitos pontos piora a aproximação devido ao efeito de Runge, que faz a função interpolada oscilar intensamente nas extremidades.
+Splines cúbicas são mais estáveis, pois interpolam os dados suavemente sem gerar oscilações descontroladas.
+Se precisar de uma interpolação confiável, usar spline cúbica é geralmente a melhor escolha.
+Se quiser ajustes no código ou outra explicação, só avisar! 🚀"""

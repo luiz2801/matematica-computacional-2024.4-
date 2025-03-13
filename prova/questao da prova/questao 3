@@ -1,0 +1,9 @@
+Gere da aleatorios com X entre [0,20] e y = f(x) = (e^x) + a sendo a uma variavel aleatoria
+entre [-5,5].
+a) Ajuste a curva usando o algoritmo linear. Use as funcoes que mais se adequem a situação
+
+b) ajuste a curva usando o algoritmo nao linear. use a funcao que mais se adeque a situação.
+
+c) plote o grafico dos ajustes em linhas com os pontos em dispersão.
+
+

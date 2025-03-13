@@ -1,0 +1,4 @@
+#dada a tabela abaixo, calcule o polinomio interpolador, defina o menor grau 
+# que possui boa precissao, justifique essa escolha e calcule o valor de f(1,23).
+x = [0, 0.5, 1, 1.5, 2, 25]
+f(x) = [-2.78, -2.241, -1.65, -0.594, 1.34, 4.564]

@@ -1,0 +1,10 @@
+calcule as integrais a seguir pela regra dos trapezios e pela regra de simpson
+ usando 4 e 6 divisoes e compare os resultados.
+a) integral de 1 ate 2 (e^x) dx
+
+b) integral de 1 ate 4 (raiz de x) dx
+
+x) integral de 2 ate 14 de dx sobre raiz de x
+
+
+com base nessa questao resolva a questao com o seguinte codigo, faça de forma correta, nao apague muito as coisas e coloque bastante comentarios para eu entender tudo
